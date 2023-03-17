@@ -3,5 +3,4 @@ working:
   key: "f98cde64c8f4f20f63f0d2a91c5bfca5"
 
 server:
-  netty:
-    connection-timeout: 36000000
+  port: 8080

@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
          */
         config.enableSimpleBroker("/topic");
         /*
-            Префик маппинга, по которому ожидается приход сообщения
+            Префикс маппинга, по которому ожидается приход сообщения
          */
         config.setApplicationDestinationPrefixes("/app");
     }

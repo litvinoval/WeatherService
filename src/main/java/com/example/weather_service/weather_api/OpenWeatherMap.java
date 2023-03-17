@@ -3,10 +3,10 @@ package com.example.weather_service.weather_api;
 
 import com.example.weather_service.ServerException;
 import com.example.weather_service.holders.WorkProps;
-import com.example.weather_service.pojo.AdditionalParamWeather;
-import com.example.weather_service.pojo.MainParamWeather;
-import com.example.weather_service.pojo.ReceiveData;
-import com.example.weather_service.pojo.WeatherCondition;
+import com.example.weather_service.pojo.server_db.AdditionalParamWeather;
+import com.example.weather_service.pojo.server_db.MainParamWeather;
+import com.example.weather_service.pojo.server_db.ReceiveData;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -34,19 +34,31 @@ public class OpenWeatherMap {
         this.workProps = workProps;
     }
 
+    public synchronized WeatherCondition getData(
+                String city, WeatherCondition weatherCondition)
+                                            throws ServerException {
+
+        return workProps.getMode() == 0 ?
+                this.getRealData(city, weatherCondition) :
+                    this.getMockData(weatherCondition);
+    }
+
     /*
         Получение случайных данных
             Случайное значение температуры получается путем умножения значения,
-        возвращаемого Math.random() на реальное время в миллисекундах, чтобы результат работы
-        метода казался случайным.
+        возвращаемого Math.random(), на реальное время в миллисекундах, чтобы результат работы
+        казался случайным.
         После этого возвращается остаток от деления полученного числа на 50, чтобы получить
         результат в диапазоне реальных температур Земли.
-            Получение описания погоды выполняется с помощью получения одного из четырех случайных значений
-        через Math.random() и остатка от деления на 4.
+            Получение описания погоды получается путем умножения значения,
+        возвращаемого Math.random(), на реальное время в миллисекундах, чтобы результат работы
+        казался случайным.
+            После этого возвращается остаток от деления полученного числа на 4, чтобы получить
+        результат одного из четрых типов погоды.
             Далее значение через switch конвертируется в одно из описаний погоды.
      */
-    public WeatherCondition getMockData(
-            WeatherCondition weatherCondition) throws ServerException {
+    private WeatherCondition getMockData(
+                WeatherCondition weatherCondition) throws ServerException {
 
         long temp = (long) (Math.random()
                 * System.currentTimeMillis());
@@ -56,22 +68,28 @@ public class OpenWeatherMap {
         int typeOfPrecipitation = (int) (Math.random()
                 * System.currentTimeMillis() % 4);
         weatherCondition.setTemp(String.valueOf(temp));
+
         weatherCondition.setPrecipitation(
                 convertTypeToString(typeOfPrecipitation));
+
+        weatherCondition.setCity(
+                temp < 0 ? "Moscow" : "Petersburg");
+
         return weatherCondition;
     }
     /*
         Получение реальных данных
             Выполняется запрос к API сервиса погоды, запрос возвращает данные в формате
-        JSON. Из полученных данных извлекается объект типа ReceiveData. Далее из полей полученного
-        объекта извлекаются объекты MainParamWeather и AdditionalParamWeather, в полях которых
-        лежат интересующие нас значения.
+        JSON. Из полученных данных извлекается объект типа ReceiveData.
+            Далее из полей полученного объекта извлекаются объекты MainParamWeather и AdditionalParamWeather,
+        в полях которых лежат интересующие нас значения.
      */
-    public WeatherCondition getRealData(String city,
+    private WeatherCondition getRealData(String city,
                                         WeatherCondition weatherCondition){
-
+        int id = city.equals("Moscow") ?
+                                524901 : 498817;
         String url = "https://api.openweathermap.org/data/2.5/weather" +
-                "?q=" + city +
+                "?id=" + id +
                 "&exclude=current" +
                 "&appid=" + workProps.getKey();
 
@@ -81,11 +99,20 @@ public class OpenWeatherMap {
                 .getBody().getMain();
         AdditionalParamWeather apw = response
                 .getBody().getWeather().get(0);
-        weatherCondition.setTemp(String.valueOf(mpw.getTemp()));
-        weatherCondition.setPrecipitation(apw.getDescription());
 
+        weatherCondition
+                .setTemp(String.valueOf(mpw.getTemp() - 272));
+        weatherCondition
+                .setPrecipitation(apw.getDescription());
+        weatherCondition
+                .setCity(city);
         return weatherCondition;
     }
+
+    /*
+        Конвертация числа в описание погоды
+        Используется при получении случайных данных о погоде
+     */
 
     private String convertTypeToString(int type)
             throws ServerException{

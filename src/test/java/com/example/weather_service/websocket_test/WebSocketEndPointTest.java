@@ -1,11 +1,12 @@
-package com.example.weather_service.ws_test;
+package com.example.weather_service.websocket_test;
 
 
-import com.example.weather_service.pojo.WeatherCondition;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertNotNull;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WebSocketEndPointTest {
 
+
     /*
         URL, по которому отправлять данные
      */
@@ -65,7 +67,7 @@ public class WebSocketEndPointTest {
 
     @Test
     public void testGetMoscowWeather()
-            throws URISyntaxException, InterruptedException, ExecutionException, TimeoutException {
+            throws InterruptedException, ExecutionException, TimeoutException {
         String city = "Moscow";
         /*
             Создание Websocket Client для коммуникации с Websocket server.
@@ -106,16 +108,22 @@ public class WebSocketEndPointTest {
              тестовое приложение-клиент помечает запрос
             3. Вернулось настоящее значение температура
             4. Вернулось настоящее состояние погоды
+            5. Вернулась погода для запрашиваемого города
          */
         assertNotNull(weatherCondition);
-        Assert.assertEquals(1, weatherCondition.getCount());
-        assertNotNull(weatherCondition.getTemp());
-        assertNotNull(weatherCondition.getPrecipitation());
+        Assert.assertEquals(
+                1, weatherCondition.getCount());
+        assertNotNull(
+                weatherCondition.getTemp());
+        assertNotNull(
+                weatherCondition.getPrecipitation());
+        Assert.assertEquals(
+                "Moscow", weatherCondition.getCity());
     }
 
     @Test
     public void testGetPeterWeather()
-            throws URISyntaxException, InterruptedException, ExecutionException, TimeoutException {
+            throws InterruptedException, ExecutionException, TimeoutException {
 
         /*
             Выполняется как тест выше, только запрос погоды из Санкт-Петербурга
@@ -141,9 +149,14 @@ public class WebSocketEndPointTest {
         WeatherCondition weatherCondition = completableFuture.get(10, SECONDS);
 
         assertNotNull(weatherCondition);
-        Assert.assertEquals(1, weatherCondition.getCount());
-        assertNotNull(weatherCondition.getTemp());
-        assertNotNull(weatherCondition.getPrecipitation());
+        Assert.assertEquals(
+                1, weatherCondition.getCount());
+        assertNotNull(
+                weatherCondition.getTemp());
+        assertNotNull(
+                weatherCondition.getPrecipitation());
+        Assert.assertEquals(
+                "Petersburg", weatherCondition.getCity());
     }
 
 

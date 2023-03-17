@@ -1,4 +1,4 @@
-package com.example.weather_service.pojo;
+package com.example.weather_service.pojo.server_client;
 
 import lombok.*;
 
@@ -17,4 +17,5 @@ public class WeatherCondition {
 
     private String temp;
     private String precipitation;
+    private String city;
 }
