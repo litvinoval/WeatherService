@@ -2,7 +2,6 @@ package com.example.weather_service;
 
 import com.example.weather_service.console.Printer;
 import com.example.weather_service.holders.WorkProps;
-import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
