@@ -1,12 +1,12 @@
 package com.example.weather_service.websocket_test;
 
 
-import com.example.weather_service.pojo.server_client.WeatherCondition;
+import com.example.protocol.DTO.WeatherRequest;
+import com.example.protocol.DTO.WeatherResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
@@ -21,7 +21,6 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -56,12 +55,12 @@ public class WebSocketEndPointTest {
      */
     private static final String SUBSCRIBE_DATA_ENDPOINT = "/topic/";
 
-    private CompletableFuture<WeatherCondition> completableFuture;
+    private CompletableFuture<WeatherResponse> completableFuture;
 
     @Before
     public void setup() {
         completableFuture = new CompletableFuture<>();
-        URL = "ws://localhost:" + 8080 + "/weather";
+        URL = "http://localhost:" + 8080 + "/weather";
     }
 
 
@@ -94,12 +93,12 @@ public class WebSocketEndPointTest {
                 new CreateGameStompFrameHandler());
 
         stompSession.send(SEND_DATA_ENDPOINT + city,
-                            new WeatherCondition(1));
+                            new WeatherRequest(1));
 
         /*
             Отправка запроса /weather/app/{city}
          */
-        WeatherCondition weatherCondition = completableFuture.get(10, SECONDS);
+        WeatherResponse weatherResponse = completableFuture.get(10, SECONDS);
 
         /*
             Проверки:
@@ -110,15 +109,13 @@ public class WebSocketEndPointTest {
             4. Вернулось настоящее состояние погоды
             5. Вернулась погода для запрашиваемого города
          */
-        assertNotNull(weatherCondition);
+        assertNotNull(weatherResponse);
         Assert.assertEquals(
-                1, weatherCondition.getCount());
+                1, weatherResponse.getCount());
         assertNotNull(
-                weatherCondition.getTemp());
-        assertNotNull(
-                weatherCondition.getPrecipitation());
+                weatherResponse.getDescription());
         Assert.assertEquals(
-                "Moscow", weatherCondition.getCity());
+                "Moscow", weatherResponse.getCity().getName());
     }
 
     @Test
@@ -144,19 +141,17 @@ public class WebSocketEndPointTest {
                 new CreateGameStompFrameHandler());
 
         stompSession.send(SEND_DATA_ENDPOINT + city,
-                            new WeatherCondition(1));
+                            new WeatherRequest(1));
 
-        WeatherCondition weatherCondition = completableFuture.get(10, SECONDS);
+        WeatherResponse weatherResponse = completableFuture.get(10, SECONDS);
 
-        assertNotNull(weatherCondition);
+        assertNotNull(weatherResponse);
         Assert.assertEquals(
-                1, weatherCondition.getCount());
+                1, weatherResponse.getCount());
         assertNotNull(
-                weatherCondition.getTemp());
-        assertNotNull(
-                weatherCondition.getPrecipitation());
+                weatherResponse.getDescription());
         Assert.assertEquals(
-                "Petersburg", weatherCondition.getCity());
+                "Petersburg", weatherResponse.getCity().getName());
     }
 
 
@@ -174,7 +169,7 @@ public class WebSocketEndPointTest {
          */
         @Override
         public Type getPayloadType(StompHeaders stompHeaders) {
-            return WeatherCondition.class;
+            return WeatherResponse.class;
         }
         /*
             Преобразование данных, полученных из StompHeaders в объект
@@ -182,7 +177,7 @@ public class WebSocketEndPointTest {
          */
         @Override
         public void handleFrame(StompHeaders stompHeaders, Object o) {
-            completableFuture.complete((WeatherCondition) o);
+            completableFuture.complete((WeatherResponse) o);
         }
     }
 }

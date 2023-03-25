@@ -1,8 +1,8 @@
 package com.example.weather_service.controllers;
 
+import com.example.protocol.DTO.WeatherRequest;
+import com.example.protocol.DTO.WeatherResponse;
 import com.example.weather_service.ServerException;
-import com.example.weather_service.holders.WorkProps;
-import com.example.weather_service.pojo.server_client.WeatherCondition;
 import com.example.weather_service.weather_api.OpenWeatherMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -41,16 +41,16 @@ public class MainController {
      */
     @MessageMapping("/{city}")
     @SendTo("/topic/{city}")
-    public WeatherCondition getWeather(
+    public WeatherResponse getWeather(
             @DestinationVariable String city,
-            WeatherCondition weatherCondition) throws ServerException {
+            WeatherRequest weatherRequest) throws ServerException {
 
         city = city.equalsIgnoreCase(
                     Cities.MOSCOW.toString()) ?
                         "Moscow" : "Petersburg";
 
         return openWeatherMap
-                .getData(city, weatherCondition);
+                .getData(city, weatherRequest);
     }
 
     enum Cities{

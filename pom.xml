@@ -22,12 +22,24 @@
     <modules>
         <module>Server</module>
         <module>Protocol</module>
+        <module>ClientLibrary</module>
+        <module>ClientApp</module>
     </modules>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.example</groupId>
                 <artifactId>Protocol</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>ClientLibrary</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>ClientApp</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
