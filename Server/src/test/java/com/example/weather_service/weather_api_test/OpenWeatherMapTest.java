@@ -3,6 +3,7 @@ package com.example.weather_service.weather_api_test;
 import com.example.protocol.DTO.WeatherRequest;
 import com.example.protocol.DTO.WeatherResponse;
 import com.example.weather_service.ServerException;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import com.example.weather_service.weather_api.OpenWeatherMap;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class OpenWeatherMapTest {
         assertNotNull(
                 weatherResponse.getDescription());
         Assert.assertEquals(
-                "Moscow", weatherResponse.getCity().getName());
+                "Moscow", weatherResponse.getCity().toString());
     }
 
 

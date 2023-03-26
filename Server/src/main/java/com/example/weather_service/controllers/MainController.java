@@ -3,6 +3,7 @@ package com.example.weather_service.controllers;
 import com.example.protocol.DTO.WeatherRequest;
 import com.example.protocol.DTO.WeatherResponse;
 import com.example.weather_service.ServerException;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import com.example.weather_service.weather_api.OpenWeatherMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -10,6 +11,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /*
@@ -46,8 +48,8 @@ public class MainController {
             WeatherRequest weatherRequest) throws ServerException {
 
         city = city.equalsIgnoreCase(
-                    Cities.MOSCOW.toString()) ?
-                        "Moscow" : "Petersburg";
+                Cities.MOSCOW.toString()) ?
+                "Moscow" : "Petersburg";
 
         return openWeatherMap
                 .getData(city, weatherRequest);

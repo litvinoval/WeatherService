@@ -5,7 +5,9 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class WeatherResponse {
+    @NonNull
     private int count;
     private int temp;
     private Description description;

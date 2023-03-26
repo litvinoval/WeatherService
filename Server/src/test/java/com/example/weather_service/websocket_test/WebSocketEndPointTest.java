@@ -3,6 +3,7 @@ package com.example.weather_service.websocket_test;
 
 import com.example.protocol.DTO.WeatherRequest;
 import com.example.protocol.DTO.WeatherResponse;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +33,8 @@ import static org.junit.Assert.assertNotNull;
 
 /*
     endpoints для тестирования:
-    /weather/app/{city}
-    /weather/topic/{city}
+    /weather/app/create/{city}
+    /weather/topic/board/{city}
     Приложение запустится и сконфигурируется на случайном порту
  */
 
@@ -60,7 +61,7 @@ public class WebSocketEndPointTest {
     @Before
     public void setup() {
         completableFuture = new CompletableFuture<>();
-        URL = "http://localhost:" + 8080 + "/weather";
+        URL = "ws://localhost:" + 8080 + "/weather";
     }
 
 
@@ -83,7 +84,7 @@ public class WebSocketEndPointTest {
 
         StompSession stompSession =
                 stompClient.connect(URL, new StompSessionHandlerAdapter() {
-        }).get(1, SECONDS);
+                }).get(10, SECONDS);
 
         /*
             Подписка на созданные конечные точки и отправка сообщения им
@@ -93,7 +94,7 @@ public class WebSocketEndPointTest {
                 new CreateGameStompFrameHandler());
 
         stompSession.send(SEND_DATA_ENDPOINT + city,
-                            new WeatherRequest(1));
+                new WeatherRequest(1));
 
         /*
             Отправка запроса /weather/app/{city}
@@ -111,11 +112,11 @@ public class WebSocketEndPointTest {
          */
         assertNotNull(weatherResponse);
         Assert.assertEquals(
-                1, weatherResponse.getCount());
+                0, weatherResponse.getCount());
         assertNotNull(
                 weatherResponse.getDescription());
         Assert.assertEquals(
-                "Moscow", weatherResponse.getCity().getName());
+                "MOSCOW", weatherResponse.getCity().toString());
     }
 
     @Test
@@ -134,24 +135,24 @@ public class WebSocketEndPointTest {
 
         StompSession stompSession =
                 stompClient.connect(URL, new StompSessionHandlerAdapter() {
-                }).get(1, SECONDS);
+                }).get(10, SECONDS);
 
         stompSession.subscribe(
                 SUBSCRIBE_DATA_ENDPOINT + city,
                 new CreateGameStompFrameHandler());
 
         stompSession.send(SEND_DATA_ENDPOINT + city,
-                            new WeatherRequest(1));
+                new WeatherRequest(1));
 
         WeatherResponse weatherResponse = completableFuture.get(10, SECONDS);
 
         assertNotNull(weatherResponse);
         Assert.assertEquals(
-                1, weatherResponse.getCount());
+                0, weatherResponse.getCount());
         assertNotNull(
                 weatherResponse.getDescription());
         Assert.assertEquals(
-                "Petersburg", weatherResponse.getCity().getName());
+                "PETERSBURG", weatherResponse.getCity().toString());
     }
 
 

@@ -1,10 +1,11 @@
 package com.example.protocol.DTO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class WeatherRequest {
+    @NonNull
     private int count;
 }

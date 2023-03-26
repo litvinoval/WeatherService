@@ -7,6 +7,7 @@ import com.example.protocol.DTO.WeatherRequest;
 import com.example.protocol.DTO.WeatherResponse;
 import com.example.weather_service.ServerException;
 import com.example.weather_service.holders.WorkProps;
+import com.example.weather_service.pojo.server_client.WeatherCondition;
 import com.example.weather_service.pojo.server_db.AdditionalParamWeather;
 import com.example.weather_service.pojo.server_db.MainParamWeather;
 import com.example.weather_service.pojo.server_db.ReceiveData;
@@ -37,13 +38,13 @@ public class OpenWeatherMap {
         this.workProps = workProps;
     }
 
-    public WeatherResponse getData(
-                String city, WeatherRequest weatherRequest)
-                                            throws ServerException {
+    public synchronized WeatherResponse getData(
+            String city, WeatherRequest weatherRequest)
+            throws ServerException {
 
         return workProps.getMode() == 0 ?
                 this.getRealData(city, weatherRequest) :
-                    this.getMockData(weatherRequest);
+                this.getMockData(weatherRequest);
     }
 
     /*
@@ -61,22 +62,19 @@ public class OpenWeatherMap {
             Далее значение через switch конвертируется в одно из описаний погоды.
      */
     private WeatherResponse getMockData(
-                WeatherRequest weatherRequest) throws ServerException {
-
+            WeatherRequest weatherRequest) throws ServerException {
         WeatherResponse weatherResponse = new WeatherResponse();
-        weatherResponse.setCount(weatherRequest.getCount());
-
-        int temp = (int) (Math.random()
+        long temp = (long) (Math.random()
                 * System.currentTimeMillis());
         temp = temp % 2 == 0 ?
                 temp % 50 : -temp % 50;
 
         int typeOfPrecipitation = (int) (Math.random()
                 * System.currentTimeMillis() % 4);
-        weatherResponse.setTemp(temp);
+        weatherResponse.setTemp((int)temp);
 
         weatherResponse.setDescription(
-                convertTypeToDescription(typeOfPrecipitation));
+                convertTypeToString(typeOfPrecipitation));
 
         weatherResponse.setCity(
                 temp < 0 ? Cities.MOSCOW : Cities.PETERSBURG);
@@ -91,12 +89,11 @@ public class OpenWeatherMap {
         в полях которых лежат интересующие нас значения.
      */
     private WeatherResponse getRealData(String city,
-                                        WeatherRequest weatherRequest){
+                                         WeatherRequest weatherRequest){
         WeatherResponse weatherResponse = new WeatherResponse();
-        weatherResponse.setCount(weatherRequest.getCount());
         int id = city.equals("Moscow") ?
-                                524901 : 498817;
-        String url = "http://api.openweathermap.org/data/2.5/weather" +
+                524901 : 498817;
+        String url = "https://api.openweathermap.org/data/2.5/weather" +
                 "?id=" + id +
                 "&exclude=current" +
                 "&appid=" + workProps.getKey();
@@ -107,7 +104,7 @@ public class OpenWeatherMap {
                 .getBody().getMain();
         AdditionalParamWeather apw = response
                 .getBody().getWeather().get(0);
-        System.out.println(apw);
+
         weatherResponse
                 .setTemp(mpw.getTemp() - 272);
         weatherResponse
@@ -122,7 +119,7 @@ public class OpenWeatherMap {
         Используется при получении случайных данных о погоде
      */
 
-    private Description convertTypeToDescription(int type)
+    private Description convertTypeToString(int type)
             throws ServerException{
         switch (type){
             case 0:{
