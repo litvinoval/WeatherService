@@ -1,4 +1,4 @@
-package com.example.weather_service.pojo.server_db;
+package com.example.weather_service.pojo;
 
 
 import lombok.Data;

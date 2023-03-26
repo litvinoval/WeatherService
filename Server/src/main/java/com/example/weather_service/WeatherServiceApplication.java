@@ -15,9 +15,6 @@ public class WeatherServiceApplication {
         SpringApplication.run(WeatherServiceApplication.class, args);
     }
 
-    /*
-        Создается поток для класса Printer, который пишет информацию в консоль
-     */
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();

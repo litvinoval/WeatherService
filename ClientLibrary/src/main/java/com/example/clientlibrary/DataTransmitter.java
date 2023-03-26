@@ -1,7 +1,8 @@
 package com.example.clientlibrary;
 
-import com.example.protocol.DTO.WeatherRequest;
-import com.example.protocol.DTO.WeatherResponse;
+import com.example.protocol.DTO.IO.WeatherRequest;
+import com.example.protocol.DTO.IO.WeatherResponse;
+import com.example.protocol.interfaces.IWeatherService;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
@@ -22,41 +23,63 @@ import java.util.concurrent.TimeoutException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-
-public class DataTransmitter {
-    private String URL;
-
+/*
+    Класс, устанавливающий общение клиент-сервер по WebSocket
+ */
+public class DataTransmitter implements IWeatherService {
+    /*
+        URL, по которому отправлять данные
+     */
+    private final String URL;
+    /*
+        Маппинг, по которому придет сообщение
+     */
     private static final String SEND_DATA_ENDPOINT = "/app/";
+    /*
+        Маппинг, по которому уйдут обработанные данные
+     */
     private static final String SUBSCRIBE_DATA_ENDPOINT = "/topic/";
 
     private CompletableFuture<WeatherResponse> completableFuture;
 
     public DataTransmitter() {
-        completableFuture = new CompletableFuture<>();
         URL = "ws://localhost:" + 8080 + "/weather";
     }
 
-    public WeatherResponse getData()
+    public WeatherResponse getData(WeatherRequest weatherRequest)
             throws InterruptedException, ExecutionException, TimeoutException {
-        String city = "Moscow";
 
+        completableFuture = new CompletableFuture<>();
+        /*
+            Создание Websocket Client для коммуникации с Websocket server.
+            Чтобы это сделать используется WebSocketStompClient
+         */
         WebSocketStompClient stompClient =
                 new WebSocketStompClient(new SockJsClient(createTransportClient()));
-
+        /*
+            Добавление JacksonMessageConverter
+            Подключение к существующему URL
+         */
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
+        /*
+            Подписка на созданные конечные точки и отправка сообщения им
+         */
         StompSession stompSession =
                 stompClient.connect(URL, new StompSessionHandlerAdapter() {
-                }).get(1, SECONDS);
+                }).get(10, SECONDS);
 
         stompSession.subscribe(
-                SUBSCRIBE_DATA_ENDPOINT + city,
+                SUBSCRIBE_DATA_ENDPOINT + weatherRequest.getCity().getName(),
                 new CreateGameStompFrameHandler());
 
-        stompSession.send(SEND_DATA_ENDPOINT + city,
-                new WeatherRequest(1));
+        stompSession.send(SEND_DATA_ENDPOINT + weatherRequest.getCity().getName(),
+                weatherRequest);
+        /*
+            Отправка запроса /weather/app/{city} и возвращение клиенту полученного результата
+         */
 
         return completableFuture.get(10, SECONDS);
+
 
     }
 

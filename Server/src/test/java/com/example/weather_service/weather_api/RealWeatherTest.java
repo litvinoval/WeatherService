@@ -1,33 +1,29 @@
-package com.example.weather_service.weather_api_test;
+package com.example.weather_service.weather_api;
 
-import com.example.protocol.DTO.WeatherRequest;
-import com.example.protocol.DTO.WeatherResponse;
-import com.example.weather_service.ServerException;
-import com.example.weather_service.pojo.server_client.WeatherCondition;
-import com.example.weather_service.weather_api.OpenWeatherMap;
+import com.example.protocol.DTO.IO.WeatherRequest;
+import com.example.protocol.DTO.IO.WeatherResponse;
+import com.example.protocol.DTO.enums.Cities;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-/*
-    Тест для метода getData() объекта OpenWeatherMap
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class OpenWeatherMapTest {
+class RealWeatherTest {
     @Autowired
-    private OpenWeatherMap openWeatherMap;
-
+    RealWeather realWeather;
     @Test
-    public void testGetData() throws ServerException {
-        WeatherRequest weatherRequest = new WeatherRequest(1);
-        WeatherResponse weatherResponse = openWeatherMap.getData("Moscow", weatherRequest);
+    void getRealData() {
+        WeatherRequest weatherRequest = new WeatherRequest(
+                                            3, Cities.MOSCOW);
+        WeatherResponse weatherResponse = realWeather
+                                                .getRealData(weatherRequest);
         /*
             Проверки:
             1. Что тип возвращаемого значения не null
@@ -39,13 +35,12 @@ public class OpenWeatherMapTest {
          */
         assertNotNull(weatherResponse);
         Assert.assertEquals(
-                1, weatherResponse.getCount());
+                3, weatherResponse.getCount());
+        assertNotNull(
+                weatherResponse.getTemp());
         assertNotNull(
                 weatherResponse.getDescription());
         Assert.assertEquals(
-                "Moscow", weatherResponse.getCity().toString());
+                "MOSCOW", weatherResponse.getCity().toString());
     }
-
-
-
 }

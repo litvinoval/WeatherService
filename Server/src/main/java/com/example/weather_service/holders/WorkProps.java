@@ -8,7 +8,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /*
-    Класс, с помощью которого обновляются параметры сервера, получаемые из
+    Класс, с помощью которого настраиваются параметры сервера, получаемые из
     файла конфигурации
  */
 @ConfigurationProperties(prefix = "working")

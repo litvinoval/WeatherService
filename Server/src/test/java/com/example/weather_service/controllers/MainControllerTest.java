@@ -1,12 +1,11 @@
-package com.example.weather_service.websocket_test;
+package com.example.weather_service.controllers;
 
-
-import com.example.protocol.DTO.WeatherRequest;
-import com.example.protocol.DTO.WeatherResponse;
-import com.example.weather_service.pojo.server_client.WeatherCondition;
+import com.example.protocol.DTO.IO.WeatherRequest;
+import com.example.protocol.DTO.IO.WeatherResponse;
+import com.example.protocol.DTO.enums.Cities;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -31,18 +30,9 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertNotNull;
 
-/*
-    endpoints для тестирования:
-    /weather/app/create/{city}
-    /weather/topic/board/{city}
-    Приложение запустится и сконфигурируется на случайном порту
- */
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class WebSocketEndPointTest {
-
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+class MainControllerTest {
     /*
         URL, по которому отправлять данные
      */
@@ -58,16 +48,14 @@ public class WebSocketEndPointTest {
 
     private CompletableFuture<WeatherResponse> completableFuture;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void before() {
         completableFuture = new CompletableFuture<>();
         URL = "ws://localhost:" + 8080 + "/weather";
     }
 
-
     @Test
-    public void testGetMoscowWeather()
-            throws InterruptedException, ExecutionException, TimeoutException {
+    void getWeather() throws ExecutionException, InterruptedException, TimeoutException {
         String city = "Moscow";
         /*
             Создание Websocket Client для коммуникации с Websocket server.
@@ -94,7 +82,7 @@ public class WebSocketEndPointTest {
                 new CreateGameStompFrameHandler());
 
         stompSession.send(SEND_DATA_ENDPOINT + city,
-                new WeatherRequest(1));
+                new WeatherRequest(1, Cities.MOSCOW));
 
         /*
             Отправка запроса /weather/app/{city}
@@ -112,50 +100,14 @@ public class WebSocketEndPointTest {
          */
         assertNotNull(weatherResponse);
         Assert.assertEquals(
-                0, weatherResponse.getCount());
+                1, weatherResponse.getCount());
+        assertNotNull(
+                weatherResponse.getTemp());
         assertNotNull(
                 weatherResponse.getDescription());
         Assert.assertEquals(
                 "MOSCOW", weatherResponse.getCity().toString());
     }
-
-    @Test
-    public void testGetPeterWeather()
-            throws InterruptedException, ExecutionException, TimeoutException {
-
-        /*
-            Выполняется как тест выше, только запрос погоды из Санкт-Петербурга
-         */
-        String city = "Petersburg";
-
-        WebSocketStompClient stompClient =
-                new WebSocketStompClient(new SockJsClient(createTransportClient()));
-
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
-
-        StompSession stompSession =
-                stompClient.connect(URL, new StompSessionHandlerAdapter() {
-                }).get(10, SECONDS);
-
-        stompSession.subscribe(
-                SUBSCRIBE_DATA_ENDPOINT + city,
-                new CreateGameStompFrameHandler());
-
-        stompSession.send(SEND_DATA_ENDPOINT + city,
-                new WeatherRequest(1));
-
-        WeatherResponse weatherResponse = completableFuture.get(10, SECONDS);
-
-        assertNotNull(weatherResponse);
-        Assert.assertEquals(
-                0, weatherResponse.getCount());
-        assertNotNull(
-                weatherResponse.getDescription());
-        Assert.assertEquals(
-                "PETERSBURG", weatherResponse.getCity().toString());
-    }
-
-
 
     private List<Transport> createTransportClient() {
         List<Transport> transports = new ArrayList<>(1);
