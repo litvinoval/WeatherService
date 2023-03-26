@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Server" />
+        <module name="Protocol" />
+        <module name="ClientLibrary" />
+        <module name="ClientApp" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ClientApp" target="11" />
+      <module name="ClientLibrary" target="11" />
+      <module name="Protocol" target="11" />
+      <module name="Server" target="11" />
+      <module name="WeatherService" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ClientApp" options="-parameters" />
+      <module name="ClientLibrary" options="-parameters" />
+      <module name="Protocol" options="-parameters" />
+      <module name="Server" options="-parameters" />
+      <module name="WeatherService" options="" />
+    </option>
+  </component>
+</project>
