@@ -25,7 +25,7 @@ public class MainController {
         weathеальнerSelector - объект класса, который выбирает, какие данные о погоде, реальные или случайные, должен
         получить клиент
     */
-    private WeatherSelector weatherSelector;
+    private final WeatherSelector weatherSelector;
     @Autowired
     public MainController(WeatherSelector weatherSelector) {
         this.weatherSelector = weatherSelector;
