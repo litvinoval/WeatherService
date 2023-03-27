@@ -65,6 +65,7 @@ public class RealWeather {
                 .setCity(weatherRequest.getCity());
         return weatherResponse;
     }
+
     /*
             Изменяет получененное описание погоды, с строчными буквами и пробелами между слов,
         в формат константы для enum Description

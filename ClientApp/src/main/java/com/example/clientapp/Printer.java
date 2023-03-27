@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 /*
-        Класс, эмитрующий действия клиента, вызывает объект DataTransmitter, который, в свою очередь, устанавливает
-    диалог клиент-сервер
+        Класс, эмитирующий действия пользователя, вызывает объект DataTransmitter, который, в свою очередь,
+    устанавливает диалог клиент-сервер
  */
 @Component
 public class Printer implements Runnable{
