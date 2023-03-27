@@ -71,6 +71,8 @@ public class RealWeather {
         в формат константы для enum Description
      */
     private String changeLine(String description){
+        if(description.contains("dust"))
+            return "DUST";
         String[] words = description.split(" ");
         StringBuilder sb = new StringBuilder();
         for(String w : words){

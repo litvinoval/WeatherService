@@ -16,10 +16,10 @@ public enum Description {
     THUNDERSTORM_WITH_LIGHT_DRIZZLE("Thunderstorm with light drizzle"),
     THUNDERSTORM_WITH_DRIZZLE("Thunderstorm with drizzle"),
     THUNDERSTORM_WITH_HEAVY_DRIZZLE("Thunderstorm with heavy drizzle"),
-    LIGHT_INTENSITY_DRIZZLE("Light intensity drizzle"),
 
     //drizzle
 
+    LIGHT_INTENSITY_DRIZZLE("Light intensity drizzle"),
     DRIZZLE("Drizzle"),
     HEAVY_INTENSITY_DRIZZLE("Heavy intensity drizzle"),
     LIGHT_INTENSITY_DRIZZLE_RAIN("Light intensity drizzle rain"),
@@ -64,8 +64,8 @@ public enum Description {
     DUST("Dust"),
     FOG("Fog"),
     SAND("Sand"),
-    ASH("Ash"),
-    SQUALL("Squall"),
+    VOLCANIC_ASH("Volcanic ash"),
+    SQUALLS("Squall"),
     TORNADO("Tornado"),
 
     //clear
