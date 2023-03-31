@@ -14,7 +14,8 @@ import java.util.concurrent.TimeoutException;
  */
 @Component
 public class Printer implements Runnable{
-    private int count;
+    private final Object o = new Object();
+    private volatile int count;
 
     private final DataTransmitter dataTransmitter;
 
@@ -25,27 +26,30 @@ public class Printer implements Runnable{
     @Override
     public void run() {
 
-            while(true){
-                try {
-                    String city = System.currentTimeMillis() % 2 == 0 ?
-                        "Moscow" : "Petersburg";
+        while(true){
+            try {
+                String city = System.currentTimeMillis() % 2 == 0 ?
+                    "Moscow" : "Petersburg";
 
-                    WeatherResponse weatherResponse = dataTransmitter.getData(
-                            new WeatherRequest(count++, Cities.valueOf(city.toUpperCase())));
-
-                    print(weatherResponse);
-                    Thread.sleep(10013);
-
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-
-                } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
-
-                } catch (TimeoutException e) {
-                    throw new RuntimeException(e);
+                WeatherResponse weatherResponse = dataTransmitter.getData(
+                        new WeatherRequest(count, Cities.valueOf(city.toUpperCase())));
+                synchronized (o){
+                    count++;
                 }
+
+                print(weatherResponse);
+                Thread.sleep(10013);
+
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+
+            } catch (TimeoutException e) {
+                throw new RuntimeException(e);
             }
+        }
     }
     /*
         метод для печати к консоль
