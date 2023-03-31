@@ -14,7 +14,6 @@ import java.util.concurrent.TimeoutException;
  */
 @Component
 public class Printer implements Runnable{
-    private final Object o = new Object();
     private volatile int count;
 
     private final DataTransmitter dataTransmitter;
@@ -33,10 +32,7 @@ public class Printer implements Runnable{
 
                 WeatherResponse weatherResponse = dataTransmitter.getData(
                         new WeatherRequest(count, Cities.valueOf(city.toUpperCase())));
-                synchronized (o){
-                    count++;
-                }
-
+                newCount();
                 print(weatherResponse);
                 Thread.sleep(10013);
 
@@ -51,12 +47,16 @@ public class Printer implements Runnable{
             }
         }
     }
+
+    private synchronized void newCount(){
+        count++;
+    }
     /*
         метод для печати к консоль
      */
     private void print(WeatherResponse weatherResponse){
         StringBuilder sb = new StringBuilder();
-        sb.append("count=").append(
+        sb.append("id=").append(
                 weatherResponse.getCount()).append(", ");
 
         sb.append("temp=").append(
@@ -69,4 +69,6 @@ public class Printer implements Runnable{
                 weatherResponse.getCity().getName());
         System.out.println(sb);
     }
+
+
 }
